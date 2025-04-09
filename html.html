@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Canada Only Map</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    #map { height: 90vh; }
+    .legend {
+      background: white;
+      padding: 10px;
+      line-height: 1.5em;
+    }
+    .legend div { display: flex; align-items: center; }
+    .legend span {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 6px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script>
+  const map = L.map('map', {
+    center: [56.1304, -106.3468],
+    zoom: 4,
+    zoomControl: true,
+    attributionControl: false
+  });
+
+  // No basemap — blank canvas for Canada only
+
+  const points = [
+    { type: "success", coords: [43.65107, -79.347015], label: "Toronto" },
+    { type: "success", coords: [49.2827, -123.1207], label: "Vancouver" },
+    { type: "success", coords: [45.5017, -73.5673], label: "Montreal" },
+    { type: "location", coords: [51.0447, -114.0719], label: "Calgary" },
+    { type: "location", coords: [45.4215, -75.6998], label: "Ottawa" },
+    { type: "location", coords: [49.8951, -97.1384], label: "Winnipeg" },
+    { type: "flex", coords: [53.5461, -113.4938], label: "Edmonton" },
+    { type: "flex", coords: [46.8139, -71.2082], label: "Quebec City" },
+  ];
+
+  const colors = {
+    success: "#111",
+    location: "#a00",
+    flex: "#fff"
+  };
+
+  points.forEach(p => {
+    L.circleMarker(p.coords, {
+      radius: 6,
+      color: colors[p.type],
+      fillColor: colors[p.type],
+      fillOpacity: p.type === 'flex' ? 0 : 1,
+      weight: p.type === 'flex' ? 2 : 0.5
+    })
+    .bindPopup(`<strong>${p.label}</strong><br>${p.type.charAt(0).toUpperCase() + p.type.slice(1)} Location`)
+    .addTo(map);
+  });
+
+  // Load Canada provinces GeoJSON (make sure it's in the same repo folder)
+  fetch('lpr_000b21a_e.json')
+    .then(res => res.json())
+    .then(data => {
+      const keep = ["Ontario", "Quebec", "British Columbia", "Alberta", "Manitoba"];
+      L.geoJSON(data, {
+        filter: f => keep.includes(f.properties.PRENAME || f.properties.PRNAME),
+        style: {
+          color: "#333",
+          weight: 2,
+          fillColor: "#eee",
+          fillOpacity: 1
+        }
+      }).addTo(map);
+    });
+
+  // Legend
+  const legend = L.control({ position: "bottomright" });
+  legend.onAdd = function () {
+    const div = L.DomUtil.create("div", "legend");
+    div.innerHTML += `<div><span style="background:#111;"></span> Customer success stories</div>`;
+    div.innerHTML += `<div><span style="background:#a00;"></span> Locations</div>`;
+    div.innerHTML += `<div><span style="background:#fff; border: 1px solid #000;"></span> Flex locations</div>`;
+    return div;
+  };
+  legend.addTo(map);
+</script>
+
+</body>
+</html>

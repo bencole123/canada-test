@@ -35,6 +35,25 @@
     attributionControl: false
   });
 
+  // Create a custom pane below default overlay pane
+  map.createPane('geojsonPane');
+  map.getPane('geojsonPane').style.zIndex = 399; // Default overlayPane is 400
+
+  // Load GeoJSON basemap into the custom pane
+  fetch('ca.json')
+    .then(res => res.json())
+    .then(data => {
+      L.geoJSON(data, {
+        pane: 'geojsonPane', // Assign to custom pane
+        style: {
+          color: "#333",
+          weight: 2,
+          fillColor: "#eee",
+          fillOpacity: 1
+        }
+      }).addTo(map);
+    });
+
   const points = [
     { type: "success", coords: [43.65107, -79.347015], label: "Toronto" },
     { type: "success", coords: [49.2827, -123.1207], label: "Vancouver" },
@@ -63,20 +82,6 @@
     .bindPopup(`<strong>${p.label}</strong><br>${p.type.charAt(0).toUpperCase() + p.type.slice(1)} Location`)
     .addTo(map);
   });
-
-  // Load basemap from ca.json
-  fetch('ca.json')
-    .then(res => res.json())
-    .then(data => {
-      L.geoJSON(data, {
-        style: {
-          color: "#333",
-          weight: 2,
-          fillColor: "#eee",
-          fillOpacity: 1
-        }
-      }).addTo(map);
-    });
 
   // Legend
   const legend = L.control({ position: "bottomright" });

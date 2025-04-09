@@ -35,8 +35,6 @@
     attributionControl: false
   });
 
-  // No tile layer = blank background
-
   const points = [
     { type: "success", coords: [43.65107, -79.347015], label: "Toronto" },
     { type: "success", coords: [49.2827, -123.1207], label: "Vancouver" },
@@ -66,8 +64,8 @@
     .addTo(map);
   });
 
-  // Load simplified GeoJSON file
-  fetch('simplified_canada.geojson')
+  // Load basemap from ca.json
+  fetch('ca.json')
     .then(res => res.json())
     .then(data => {
       L.geoJSON(data, {

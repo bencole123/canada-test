@@ -35,7 +35,7 @@
     attributionControl: false
   });
 
-  // No basemap — blank canvas for Canada only
+  // No tile layer = blank background
 
   const points = [
     { type: "success", coords: [43.65107, -79.347015], label: "Toronto" },
@@ -66,13 +66,11 @@
     .addTo(map);
   });
 
-  // Load Canada provinces GeoJSON (make sure it's in the same repo folder)
-  fetch('lpr_000b21a_e.json')
+  // Load simplified GeoJSON file
+  fetch('simplified_canada.geojson')
     .then(res => res.json())
     .then(data => {
-      const keep = ["Ontario", "Quebec", "British Columbia", "Alberta", "Manitoba"];
       L.geoJSON(data, {
-        filter: f => keep.includes(f.properties.PRENAME || f.properties.PRNAME),
         style: {
           color: "#333",
           weight: 2,
@@ -93,6 +91,5 @@
   };
   legend.addTo(map);
 </script>
-
 </body>
 </html>
